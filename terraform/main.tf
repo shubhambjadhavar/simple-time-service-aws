@@ -45,6 +45,7 @@ module "simple-time-service-alb" {
   vpc_id  = module.vpc.vpc_id
   subnets = module.vpc.public_subnets
   create_security_group = false
+  enable_deletion_protection = false
   security_groups = [
     module.simple-time-service-alb-security-group.security_group_id
   ]
