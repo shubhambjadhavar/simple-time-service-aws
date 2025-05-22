@@ -35,7 +35,12 @@ variable "vpc_cidr" {
   type        = string
 }
 
-variable "image_url" {
+variable "ecr_repository_name" {
   description = "The full URL of the time service container image to be used for deployment"
   type = string
+}
+
+variable "image_tag" {
+  description = "Docker image tag"
+  type        = string
 }

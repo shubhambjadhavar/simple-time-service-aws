@@ -16,6 +16,11 @@ func RootHandler(responseWriter http.ResponseWriter, request *http.Request) {
 		return
 	}
 
+	if request.URL.Path != "/" {
+		http.NotFound(responseWriter, request)
+		return
+	}
+
 	ip := getVisitorIP(request)
 	payload := RootResponse{
 		Timestamp: time.Now().UTC().Format(time.RFC3339),

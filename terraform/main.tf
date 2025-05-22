@@ -105,6 +105,8 @@ module "simple-time-service-ecs-task-security-group" {
   ]
 }
 
+data "aws_caller_identity" "current" {}
+
 module "simple-time-service-ecs" {
   source = "terraform-aws-modules/ecs/aws"
   version = "5.12.1"
@@ -143,10 +145,10 @@ module "simple-time-service-ecs" {
       container_definitions = {
         simple-time-service-container = {
           essential = true
-          image     = var.image_url
+          image     = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/${var.ecr_repository_name}:${var.image_tag}"
           port_mappings = [
             {
-              name          = "ecs-sample"
+              name          = "simple-time-service"
               containerPort = 8080
               protocol      = "tcp"
             }
@@ -157,9 +159,24 @@ module "simple-time-service-ecs" {
         }
       }
 
+      load_balancer = {
+        service = {
+          target_group_arn = module.simple-time-service-alb.target_groups["simple-time-service-ecs"].arn
+          container_name   = "simple-time-service-container"
+          container_port   = 8080
+        }
+      }
+
       # Autoscaling
       enable_autoscaling = false
     }
   }
 }
 
+output "web-service-url-root" {
+  value = "http://${module.simple-time-service-alb.dns_name}/"
+}
+
+output "web-service-url-health" {
+  value = "http://${module.simple-time-service-alb.dns_name}/health"
+}

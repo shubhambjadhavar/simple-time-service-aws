@@ -14,6 +14,11 @@ func HealthHandler(responseWriter http.ResponseWriter, request *http.Request) {
 		return
 	}
 
+	if request.URL.Path != "/health" {
+		http.NotFound(responseWriter, request)
+		return
+	}
+
 	payload := HealthResponse{
 		Status: "ok",
 	}

@@ -12,4 +12,5 @@ public_subnets_cidr = [
   "10.8.0.32/27"
 ]
 vpc_cidr = "10.8.0.0/24"
-image_url = "public.ecr.aws/x4u4h4k5/demo/simple-time-service:latest"
+ecr_repository_name = "simple-time-service"
+image_tag = "latest"

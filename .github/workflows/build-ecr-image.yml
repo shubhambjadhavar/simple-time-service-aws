@@ -1,18 +1,18 @@
 name: Build and Push Image to ECR
 
+run-name: Build-and-Push-Image-to-ECR-${{ github.run_number }}
+
 on:
   push:
     branches:
-      - main
+      - master
+    paths:
+      - 'app/**'
+      - '.github/workflows/build-ecr-image.yml'
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-
-    permissions:
-      id-token: write
-      contents: read
-
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
@@ -22,7 +22,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4.2.1
         with:
-          aws-region: "us-east-1"
+          aws-region: ${{ vars.AWS_REGION }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
@@ -31,15 +31,15 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
         with:
           mask-password: 'true'
-          registry-type: 'public'
+          registry-type: 'private'
 
       - name: Build Docker image
         working-directory: app
         run: |
-          set -eou -pipefail
-          docker build -t ${{ steps.login-ecr.outputs.registry }}/x4u4h4k5/demo/simple-time-service:latest .
+          set -eou pipefail
+          docker build -t ${{ vars.SIMPLE_TIME_SERVICE_ECR_URI }}:latest .
 
       - name: Push Docker image to ECR
         run: |
-          set -eou -pipefail
-          docker push ${{ steps.login-ecr.outputs.registry }}/x4u4h4k5/demo/simple-time-service:latest
+          set -eou pipefail
+          docker push ${{ vars.SIMPLE_TIME_SERVICE_ECR_URI }}:latest
